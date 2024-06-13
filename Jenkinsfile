@@ -23,8 +23,8 @@ pipeline {
                     sudo yum update -y
                     sudo yum install -y python3 git
                     git clone https://github.com/rushikeshmj/hello-world.git
-                    cd hello-world-python
-                    python3 app.py &
+                    cd /home/ec2-user/hello-world
+                    python3 main.py &
                     exit
                     EOF
                     '''
