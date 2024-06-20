@@ -116,7 +116,7 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 sshagent(['ssh_key']) {
-                    sh "ssh -o StrictHostKeyChecking=no ec2-user@3.86.18.96 docker run -d -p 80:80 ${DOCKER_REGISTRY}/${AWS_ECR_REPOSITORY}:latest"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@3.86.18.96 docker run -d -p 8081:8080 ${DOCKER_REGISTRY}/${AWS_ECR_REPOSITORY}:latest"
                 }
             }
         }
