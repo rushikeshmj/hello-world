@@ -7,10 +7,11 @@ pipeline {
         DOCKER_REGISTRY = "584294315145.dkr.ecr.us-east-1.amazonaws.com"
         SONARQUBE_SERVER = "http://54.152.150.181:9000"
         AWS_REGION = "us-east-1"
-        AWS_ECR_REPO = "github-poc"
+        
         AWS_ECR_ACCOUNT_ID = "533267249366"
         AWS_ECR_REGION = "us-east-1"
         AWS_ECR_REPOSITORY = "jenkins-poc"
+        DOCKER_IMAGE_NAME = "hello-world-app"
     }
     stages {
         stage('Checkout') {
