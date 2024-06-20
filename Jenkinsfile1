@@ -70,6 +70,7 @@ pipeline {
         stage('Build and tag image using Docker') {
             steps {
                 script {
+                    sh 'cd /home/ubuntu/hello-world-demo-python/hello-world'
                     docker.build("hello-world-app") // Build Docker image
                     docker.withRegistry('https://hub.docker.com/repository/docker/rushikeshmj/hello-world/', 'dckr_pat_no1CmMpmL7b1KxeF6WLCX0OJLGk') {
                         docker.image("hello-world-app").push("latest") // Push Docker image to ECR
