@@ -50,7 +50,7 @@ pipeline {
             }
         }
         
-       /* stage('SCA and SonarQube') {
+       stage('SCA and SonarQube') {
             steps {
                 // Configure SonarQube environment
                 withSonarQubeEnv('SonarQubeServer') {
@@ -58,10 +58,11 @@ pipeline {
                     script {
                         def scannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                         if (scannerHome) {
-                            sh "/home/ubuntu/hello-world-demo-python/hello-world/sonar-scanner-5.0.1.3006-linux \
+                            sh 'pwd'
+                            sh "/home/hello-world-demo-python/hello-world/sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
                                 -Dsonar.projectKey=hello-world \
                                 -Dsonar.sources=src \
-                                -Dsonar.host.url=http://54.152.150.181:9000 \
+                                -Dsonar.host.url=http://52.205.167.69:9000 \
                                 -Dsonar.login=squ_031f99275d678658a83cb2960ef6cf99b2be9664"
                         } else {
                             error "SonarQube Scanner not configured."
@@ -70,7 +71,6 @@ pipeline {
                 }
             }
         }
-        */
         stage('Build and tag image using Docker') {
             steps {
                 script {
