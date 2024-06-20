@@ -117,8 +117,8 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh_key']) {
                     sh 'ssh  -o StrictHostKeyChecking=no ubuntu@3.86.18.96 "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 533267249366.dkr.ecr.us-east-1.amazonaws.com"'
-                    sh 'ssh -o  StrictHostKeyChecking=no ubuntu@3.86.18.96 "docker pull 533267249366.dkr.ecr.us-east-1.amazonaws.com/github-poc:latest"'
-                    sh 'ssh  -o StrictHostKeyChecking=no ubuntu@3.86.18.96 "docker run -d --name jenkins_output -p 8082:8082 533267249366.dkr.ecr.us-east-1.amazonaws.com/github-poc:latest"'
+                    sh 'ssh -o  StrictHostKeyChecking=no ubuntu@3.86.18.96 "docker pull 533267249366.dkr.ecr.us-east-1.amazonaws.com/jenkins-poc:latest"'
+                    sh 'ssh  -o StrictHostKeyChecking=no ubuntu@3.86.18.96 "docker run -d --name jenkins_final -p 8082:8082 533267249366.dkr.ecr.us-east-1.amazonaws.com/jenkins-poc:latest"'
                 }
             }
         }
