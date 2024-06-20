@@ -67,45 +67,30 @@ pipeline {
             }
         }
         */
-        stage('Build') {
-            steps {
-                sh 'python setup.py sdist'
-            }
-        }
-        
-        stage('AWS Login') {
-            steps {
-                withAWS(credentials: 'aws-credentials-id', region: AWS_REGION) {
-                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}"
-                }
-            }
-        }
-        
-        stage('Docker Build') {
+        stage('Build and tag image using Docker') {
             steps {
                 script {
-                    dockerImage = docker.build("${DOCKER_REGISTRY}/${AWS_ECR_REPO}:${env.BUILD_ID}")
+                    docker.build("docker-image") // Build Docker image
+                    docker.withRegistry('https://hub.docker.com/repository/docker/rushikeshmj/hello-world/', 'dckr_pat_no1CmMpmL7b1KxeF6WLCX0OJLGk') {
+                        docker.image("docker-image").push("latest") // Push Docker image to ECR
+                    }
                 }
             }
         }
         
-        stage('Docker Scan') {
+        stage('Image scan using trivy') {
             steps {
-                sh "docker scan ${AWS_ECR_REPO}"
+                sh 'trivy your-image-name:latest' // Example command for image vulnerability scanning
             }
         }
         
-        stage('Docker Tag and Push') {
+        stage('Push to AWS ECR') {
             steps {
                 script {
-                    dockerImage.push()
+                    docker.withRegistry('https://${DOCKER_REGISTRY}', 'docker-credentials-id') {
+                        docker.image("your-image-name").push("latest") // Push Docker image to ECR again (optional)
+                    }
                 }
-            }
-        }
-        
-        stage('Pull ECR Image') {
-            steps {
-                sh "docker pull ${DOCKER_REGISTRY}/${AWS_ECR_REPO}:${env.BUILD_ID}"
             }
         }
         
