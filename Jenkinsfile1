@@ -116,6 +116,8 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 sshagent(['ssh_key']) {
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@3.86.18.96 aws ecr get-login-password --region ${AWS_ECR_REGION} | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@3.86.18.96 docker pull ${AWS_ECR_ACCOUNT_ID}.dkr.ecr.${AWS_ECR_REGION}.amazonaws.com/${AWS_ECR_REPOSITORY}:latest"
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@3.86.18.96 docker run -d -p 8081:8080 ${DOCKER_REGISTRY}/${AWS_ECR_REPOSITORY}:latest"
                 }
             }
