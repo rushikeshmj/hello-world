@@ -93,7 +93,7 @@ pipeline {
         
         stage('Image scan using trivy') {
             steps {
-                sh 'trivy image hello-world-app:latest' // Example command for image vulnerability scanning
+                sh 'trivy image /snap/bin/trivy 533267249366.dkr.ecr.us-east-1.amazonaws.com/jenkins-poc:latest' // Example command for image vulnerability scanning
             }
         }
         
