@@ -71,6 +71,7 @@ pipeline {
             steps {
                 script {
                     sh 'cd /home/ubuntu/hello-world-demo-python/hello-world'
+                    sh 'pwd'
                     sh 'ls -l Dockerfile'
                     sh 'docker build -t hello-world-app .'
                     docker.build("hello-world-app") // Build Docker image
