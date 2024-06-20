@@ -1,0 +1,120 @@
+pipeline {
+    agent {
+      label 'ec2'
+        }
+
+    environment {
+        DOCKER_REGISTRY = "584294315145.dkr.ecr.us-east-1.amazonaws.com"
+        SONARQUBE_SERVER = "http://54.152.150.181:9000"
+        AWS_REGION = "us-east-1"
+        AWS_ECR_REPO = "github-poc"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                retry(3) {
+                    checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/shekharbo/hello-world.git']]])
+                }
+            }
+        }
+        
+        stage('Unit Test') {
+            steps {
+                sh 'docker --version'
+                sh 'docker pull python:3.9'
+                sh 'pip install -r requirements.txt'
+                sh 'python3 -m venv ~/myenv'
+                sh """
+                set +x
+                . /home/ubuntu/myenv/bin/activate
+                """
+                sh """
+                /home/ubuntu/.local/bin/pytest /home/ubuntu/workspace/hello_world_demo/tests/test_main.py
+               """
+            }
+        }
+        
+        stage('Code Coverage') {
+            steps {
+                sh 'pip install coverage'
+                sh """
+                /home/ubuntu/.local/bin/coverage run -m pytest /home/ubuntu/workspace/hello_world_demo/tests/test_main.py
+                """
+                sh '/home/ubuntu/.local/bin/coverage report'
+                sh '/home/ubuntu/.local/bin/coverage xml -o coverage.xml'
+                cobertura coberturaReportFile: 'coverage.xml'
+            }
+        }
+        
+        stage('SCA and SonarQube') {
+            steps {
+                // Configure SonarQube environment
+                withSonarQubeEnv('SonarQubeServer') {
+                    // Execute SonarScanner command
+                    script {
+                        def scannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        if (scannerHome) {
+                            sh "/home/ubuntu/hello-world-demo-python/hello-world/sonar-scanner-5.0.1.3006-linux \
+                                -Dsonar.projectKey=hello-world \
+                                -Dsonar.sources=src \
+                                -Dsonar.host.url=http://54.152.150.181:9000 \
+                                -Dsonar.login=squ_031f99275d678658a83cb2960ef6cf99b2be9664"
+                        } else {
+                            error "SonarQube Scanner not configured."
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'python setup.py sdist'
+            }
+        }
+        
+        stage('AWS Login') {
+            steps {
+                withAWS(credentials: 'aws-credentials-id', region: AWS_REGION) {
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}"
+                }
+            }
+        }
+        
+        stage('Docker Build') {
+            steps {
+                script {
+                    dockerImage = docker.build("${DOCKER_REGISTRY}/${AWS_ECR_REPO}:${env.BUILD_ID}")
+                }
+            }
+        }
+        
+        stage('Docker Scan') {
+            steps {
+                sh "docker scan ${AWS_ECR_REPO}"
+            }
+        }
+        
+        stage('Docker Tag and Push') {
+            steps {
+                script {
+                    dockerImage.push()
+                }
+            }
+        }
+        
+        stage('Pull ECR Image') {
+            steps {
+                sh "docker pull ${DOCKER_REGISTRY}/${AWS_ECR_REPO}:${env.BUILD_ID}"
+            }
+        }
+        
+        stage('Deploy to EC2') {
+            steps {
+                sshagent(['ec2-ssh-credentials']) {
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@<ec2-instance-ip> docker run -d -p 80:80 ${DOCKER_REGISTRY}/${AWS_ECR_REPO}:${env.BUILD_ID}"
+                }
+            }
+        }
+    }
+}
