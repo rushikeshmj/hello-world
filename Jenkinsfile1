@@ -62,8 +62,8 @@ pipeline {
                             sh "/home/hello-world-demo-python/hello-world/sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
                                 -Dsonar.projectKey=hello-world \
                                 -Dsonar.sources=src \
-                                -Dsonar.host.url=http://52.205.167.69:9000 \
-                                -Dsonar.login=squ_031f99275d678658a83cb2960ef6cf99b2be9664"
+                                -Dsonar.host.url=http://3.86.18.96:9000 \
+                                -Dsonar.login=squ_e758c27be837e60687142a751c8734fea3da9ca3"
                         } else {
                             error "SonarQube Scanner not configured."
                         }
