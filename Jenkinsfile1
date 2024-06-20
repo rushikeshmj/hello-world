@@ -75,7 +75,7 @@ pipeline {
                     sh 'ls -l Dockerfile'
                     sh 'docker build -t hello-world-app .'
                     docker.build("hello-world-app") // Build Docker image
-                    docker.withRegistry('https://hub.docker.com/repository/docker/rushikeshmj/hello-world/', 'dckr_pat_no1CmMpmL7b1KxeF6WLCX0OJLGk') {
+                    docker.withRegistry('https://hub.docker.com/repository/docker/rushikeshmj/hello-world/', 'docker-credentials-id') {
                         docker.image("hello-world-app").push("latest") // Push Docker image to ECR
                     }
                 }
