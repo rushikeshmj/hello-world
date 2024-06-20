@@ -70,9 +70,9 @@ pipeline {
         stage('Build and tag image using Docker') {
             steps {
                 script {
-                    docker.build("docker-image") // Build Docker image
+                    docker.build("hello-world-app") // Build Docker image
                     docker.withRegistry('https://hub.docker.com/repository/docker/rushikeshmj/hello-world/', 'dckr_pat_no1CmMpmL7b1KxeF6WLCX0OJLGk') {
-                        docker.image("docker-image").push("latest") // Push Docker image to ECR
+                        docker.image("hello-world-app").push("latest") // Push Docker image to ECR
                     }
                 }
             }
@@ -80,7 +80,7 @@ pipeline {
         
         stage('Image scan using trivy') {
             steps {
-                sh 'trivy your-image-name:latest' // Example command for image vulnerability scanning
+                sh 'trivy hello-world-app:latest' // Example command for image vulnerability scanning
             }
         }
         
