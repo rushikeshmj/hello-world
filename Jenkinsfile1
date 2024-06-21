@@ -3,16 +3,11 @@ pipeline {
         label 'ec2'
     }
 
-    environment {
-        //DOCKER_REGISTRY = "584294315145.dkr.ecr.us-east-1.amazonaws.com"
+    environment {  
         SONARQUBE_SERVER = "http://$PUBLIC_IP:9000/"
-        
-        //PUBLIC_IP = "http://34.207.58.229:9000"
-        //AWS_ECR_ACCOUNT_ID = "533267249366"
         AWS_ECR_REGION = "us-east-1"
         AWS_ECR_REPOSITORY = "jenkins-poc"
         DOCKER_IMAGE_NAME = "hello-world-app"
-        //SONARQUBE_LOGIN_TOKEN = "squ_e758c27be837e60687142a751c8734fea3da9ca3"
     }
 
     stages {
