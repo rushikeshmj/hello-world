@@ -29,15 +29,22 @@ pipeline {
                 sh 'docker pull python:3.9'
                 sh 'pip install -r requirements.txt'
                 sh 'python3 -m venv ~/myenv'
-                sh 'source ~/myenv/bin/activate'
-                sh '/home/ubuntu/.local/bin/pytest /home/ubuntu/workspace/hello_world_demo/tests/test_main.py'
+                sh """
+                set +x
+                . /home/ubuntu/myenv/bin/activate
+                """
+                sh """
+                /home/ubuntu/.local/bin/pytest /home/ubuntu/workspace/hello_world_demo/tests/test_main.py
+               """
             }
         }
 
         stage('Code Coverage') {
             steps {
                 sh 'pip install coverage'
-                sh '/home/ubuntu/.local/bin/coverage run -m pytest /home/ubuntu/workspace/hello_world_demo/tests/test_main.py'
+                sh """
+                /home/ubuntu/.local/bin/coverage run -m pytest /home/ubuntu/workspace/hello_world_demo/tests/test_main.py
+                """
                 sh '/home/ubuntu/.local/bin/coverage report'
                 sh '/home/ubuntu/.local/bin/coverage xml -o coverage.xml'
                 cobertura coberturaReportFile: 'coverage.xml'
