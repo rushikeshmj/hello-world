@@ -5,7 +5,7 @@ pipeline {
 
     environment {
         //DOCKER_REGISTRY = "584294315145.dkr.ecr.us-east-1.amazonaws.com"
-        //SONARQUBE_SERVER = "http://34.207.58.229:9000/"
+        SONARQUBE_SERVER = "http://$PUBLIC_IP:9000/"
         
         //PUBLIC_IP = "http://34.207.58.229:9000"
         //AWS_ECR_ACCOUNT_ID = "533267249366"
@@ -97,9 +97,9 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 sshagent(['ssh_key']) {
-                    sh "ssh -o StrictHostKeyChecking=no ubuntu@34.207.58.229 aws ecr get-login-password --region ${AWS_ECR_REGION} | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}"
-                    sh "ssh -o StrictHostKeyChecking=no ubuntu@34.207.58.229 docker pull ${AWS_ECR_ACCOUNT_ID}.dkr.ecr.${AWS_ECR_REGION}.amazonaws.com/${AWS_ECR_REPOSITORY}:latest"
-                    sh "ssh -o StrictHostKeyChecking=no ubuntu@34.207.58.229 docker run -d -p 8081:8080 ${AWS_ECR_ACCOUNT_ID}.dkr.ecr.${AWS_ECR_REGION}.amazonaws.com/${AWS_ECR_REPOSITORY}:latest"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_IP aws ecr get-login-password --region ${AWS_ECR_REGION} | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_IP docker pull ${AWS_ECR_ACCOUNT_ID}.dkr.ecr.${AWS_ECR_REGION}.amazonaws.com/${AWS_ECR_REPOSITORY}:latest"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@$PUBLIC_IP docker run -d -p 8081:8080 ${AWS_ECR_ACCOUNT_ID}.dkr.ecr.${AWS_ECR_REGION}.amazonaws.com/${AWS_ECR_REPOSITORY}:latest"
                 }
             }
         }
